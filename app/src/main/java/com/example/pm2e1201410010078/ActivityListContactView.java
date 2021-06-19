@@ -2,6 +2,8 @@ package com.example.pm2e1201410010078;
 
 import android.Manifest;
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -34,6 +36,7 @@ public class ActivityListContactView extends AppCompatActivity {
     ArrayList<String> arregloPersonas;
     public String id_contacto="";
     public String telefono_contacto="";
+    public String nombre_contacto="";
     TextView contactoSeleccionado;
 
 
@@ -46,6 +49,7 @@ public class ActivityListContactView extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         id_contacto="";
         telefono_contacto = "";
+        nombre_contacto = "";
         contactoSeleccionado = (TextView) findViewById(R.id.txtContactoSeleccionado) ;
 
         conexion = new SQLiteConexion(this, dataBase.NAME_DATABASE, null, 1);
@@ -62,6 +66,7 @@ public class ActivityListContactView extends AppCompatActivity {
                 contactoSeleccionado.setText("ID: "+lista.get(position).getId() + " NOMBRE: "+lista.get(position).getNombre() +" TELEFONO: " +lista.get(position).getTelefono());
                 id_contacto = ""+lista.get(position).getId();
                 telefono_contacto = lista.get(position).getTelefono();
+                nombre_contacto = lista.get(position).getNombre();
             }
         });
     }
@@ -119,7 +124,29 @@ public class ActivityListContactView extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Debe seleccionar un contacto.", Toast.LENGTH_LONG).show();
             return;
         }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirme la accion");
+        builder.setMessage("Desea llamar a "+ nombre_contacto);
+        builder.setPositiveButton("LLAMAR",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        realizarLlamada();
+                    }
+                });
+        builder.setNegativeButton("CANCELAR",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // cancel the alert box and put a Toast to the
+                        // user
+                        dialog.cancel();
 
+                    }
+                });
+        builder.show();
+
+    }
+
+    private void realizarLlamada(){
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse("tel:" +telefono_contacto));
         startActivity(intent);
